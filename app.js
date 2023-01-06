@@ -23,7 +23,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 const completionTemplate = {
-  model: "text-davinci-002",
+  model: "text-davinci-003",
   prompt: "",
   temperature: 0.6,
   max_tokens: 35,
@@ -31,14 +31,19 @@ const completionTemplate = {
 
 // Endpoints
 
-app.get("/connect", (req, res) => res.type('html').send(`<p>Connection established!</p>`));
+app.get("/connect", (req, res) => {
+  res.type('text').send(`connected`)
+});
+
 
 app.get("/completion", async (req, res) => {
   const prompt = req.query.prompt;
   let input = completionTemplate;
   input.prompt = prompt;
   const response = await openai.createCompletion(input);
-  res.type('json').send(response.data.choices[0].text);
+  console.log(response)
+  console.log(response.data.choices[0])
+  res.type('text').send(response.data.choices[0].text);
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
