@@ -51,7 +51,11 @@ app.get("/completion", async (req, res) => {
   let input = completionTemplate;
   input.prompt = prompt;
   const response = await openai.createCompletion(input).catch(err => console.log(err));
-  res.type('text').send(response.data.choices[0].text);
-})
+  if (response.data) {
+    res.type('text').send(response.data.choices[0].text);
+  } else {
+    res.send(503).send("Service unavailable")
+  }
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
