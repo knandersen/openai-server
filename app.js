@@ -4,12 +4,22 @@ const { Configuration, OpenAIApi } = require("openai");
 const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 3001;
+const local = process.env.LOCAL || false;
 
 // CORS
 
 app.use(cors())
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'https://knandersen.github.io/',
+    'https://www.kevinandersen.dk',
+    'https://kevinandersen.dk',
+    local
+  ]
+  if (allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+  }
   res.header("Access-Control-Allow-Methods", "GET");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   next();
@@ -40,9 +50,7 @@ app.get("/completion", async (req, res) => {
   const prompt = req.query.prompt;
   let input = completionTemplate;
   input.prompt = prompt;
-  const response = await openai.createCompletion(input);
-  console.log(response)
-  console.log(response.data.choices[0])
+  const response = await openai.createCompletion(input).catch(err => console.log(err));
   res.type('text').send(response.data.choices[0].text);
 })
 
